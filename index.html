@@ -1,1 +1,119 @@
+<html>
+  <head>
+    <title>INFO 4310 - HW 3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        body, button {
+          font-family: 'Lato', sans-serif;
+        }
+
+        main {
+            display: flex;
+        }
+
+        /* --- map --- */
+        #map {
+            position: relative;
+            z-index: 0;
+            width: 70%;
+            height: 100vh;
+        }
+
+        circle.point:hover{
+            cursor: pointer;
+        }
+
+        /* --- sidebar --- */
+        #detail-sidebar {
+            width: 30%;
+            height: 100vh;
+            background-color: rgb(244, 244, 244);
+            padding: 1em;
+            box-sizing: border-box;
+        }
+    </style>
+  </head>
+
+  <body>
+    <main>
+        <div id="map"></div>
+        <aside id="detail-sidebar">
+            <h1 id="restaurant-name"></h1>
+        </aside>
+    </main>
+  </body>
+
+  <script>
+    // referencing this article for syncing mapbox and d3.js: https://franksh.com/posts/d3-mapboxgl/
+    // also referencing this demo: https://github.com/jorditost/mapboxgl-d3-playground/blob/master/03-map-data-interactions.html
+    mapboxgl.accessToken = "pk.eyJ1IjoidGFtbXktemhhbmciLCJhIjoiY2xod2p1a3NiMGhnaTNybGllMzhkeWx3YyJ9.fvUCg9TLcsZ9Gj-NaBCY8w";
+    var map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v9",
+        center: [-71.065, 42.3601],
+        zoom: 12
+    });
+
+    var container = map.getCanvasContainer();
+    var svg = d3.select(container)
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100vh")
+        .style("position", "absolute")
+        .style("z-index", 2);
+
+    function project(lon, lat) {
+        return map.project(new mapboxgl.LngLat(lon, lat));
+    }
+
+    map.on('load', function () {
+        requestData();
+    });
+
+    var restaurants;
+    const requestData = async function() {
+        const data = await d3.csv("yelp_boston.csv", d3.autoType);
+        console.log(data);
+
+        restaurants = svg.selectAll("circle.point")
+            .data(data)
+            .join("circle").attr("class", "point")
+            .attr("r", 5)
+            .style("fill", "#ff0000");
+        
+        render();
+
+        restaurants.on("click", function(e, d) {
+            console.log(d);
+            showDetail(d);
+        });
+
+        map.on("viewreset", render);
+        map.on("move", render);
+        map.on("moveend", render);
+    }
+
+    function render() {
+        restaurants.attr("cx", function(d) { return project(d.longitude, d.latitude).x })
+                .attr("cy", function(d) { return project(d.longitude, d.latitude).y });
+    }
+
+    function showDetail(d) {
+        d3.select('#restaurant-name')
+        .text(d.name);
+    }
+
+  </script>
+</html>
 
