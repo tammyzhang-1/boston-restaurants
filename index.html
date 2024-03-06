@@ -115,6 +115,7 @@
                 .attr("stroke-width", 4);
 
             showDetail(d);
+            updateDots(d, data, similarities)
         });
 
         map.on("viewreset", render);
@@ -147,35 +148,33 @@
         let detailContainer = document.getElementById("detail-sidebar");
         d3.selectAll("#website").text("Website").on("click", function() { window.open(`${d.url}`);})
             .style('border', 1)
-        
+    }
+
+    function updateDots(d, data, s){
         //bullshit spaghetti
         // required me to put the datasets as input into this function which didn't make sense... 
         // i assume this means it shouldnt go in this function. 
 
-        // const categories = ['breakfast_brunch', 'burgers', 'sandwiches', 'mexican', 'japanese', 'italian', 'pizza', 'seafood', 'raw_food', 'newamerican', 
-        //     'mediterranean', 'vegan', 'gluten_free', 'spanish', 'wine_bars', 'tapasmallplates', 'salad', 'juicebars', 'vegetarian', 'indpak', 
-        //     'belgian', 'tradamerican', 'pubs', 'korean', 'asianfusion', 'lounges', 'coffee', 'delis', 'grocery', 'bakeries', 'gastropubs', 
-        //     'bars', 'cocktailbars', 'desserts', 'french', 'steak', 'cheese', 'bubbletea', 'vietnamese', 'catering', 
-        //     'cheesesteaks', 'turkish', 'falafel', 'pakistani', 'bangladeshi', 'himalayan', 'halal', 'hotdogs', 'sushi', 'hotpot', 'mongolian', 
-        //     'dimsum', 'cantonese', 'foodtrucks', 'latin', 'thai', 'icecream', 'donuts', 'cupcakes', 'greek', 'ethnicmarkets', 
-        //     'armenian', 'mideastern', 'chinese']
-        // //get the list of similar restaurants 
-        // let sim_restaurants=""
-        // for(i=0; i<categories.length; i++){
-        //     if(d[`${categories[i]}`] == 1){
-        //         sim_restaurants = sim_restaurants + s[0][`${categories[i]}`];
-        //     }
-        // }
-        // let sim_restaurants_list = sim_restaurants.split("; ")
-        // console.log(data)
+        const categories = ['breakfast_brunch', 'burgers', 'sandwiches', 'mexican', 'japanese', 'italian', 'pizza', 'seafood', 'raw_food', 'newamerican', 
+            'mediterranean', 'vegan', 'gluten_free', 'spanish', 'wine_bars', 'tapasmallplates', 'salad', 'juicebars', 'vegetarian', 'indpak', 
+            'belgian', 'tradamerican', 'pubs', 'korean', 'asianfusion', 'lounges', 'coffee', 'delis', 'grocery', 'bakeries', 'gastropubs', 
+            'bars', 'cocktailbars', 'desserts', 'french', 'steak', 'cheese', 'bubbletea', 'vietnamese', 'catering', 
+            'cheesesteaks', 'turkish', 'falafel', 'pakistani', 'bangladeshi', 'himalayan', 'halal', 'hotdogs', 'sushi', 'hotpot', 'mongolian', 
+            'dimsum', 'cantonese', 'foodtrucks', 'latin', 'thai', 'icecream', 'donuts', 'cupcakes', 'greek', 'ethnicmarkets', 
+            'armenian', 'mideastern', 'chinese']
+        //get the list of similar restaurants 
+        let sim_restaurants=""
+        for(i=0; i<categories.length; i++){
+            if(d[`${categories[i]}`] == 1){
+                sim_restaurants = sim_restaurants + s[0][`${categories[i]}`];
+            }
+        }
+        let sim_restaurants_list = sim_restaurants.split("; ")
+        console.log(sim_restaurants_list)
 
-        //AFTER I HAVE THE LIST I CANNOT FIGURE OUT HOW TO SELECT ONLY THE CIRCLES THAT ARE IN THIS LIST???
-        
-        
-        
-             
-
+        //AFTER I HAVE THE LIST I CANNOT FIGURE OUT HOW TO SELECT ONLY THE CIRCLES THAT ARE IN THIS LIST??    
     }
+    
 
   </script>
 </html>
