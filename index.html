@@ -50,6 +50,10 @@
         <div id="map"></div>
         <aside id="detail-sidebar">
             <h1 id="restaurant-name"></h1>
+            <p id="category"></p>
+            <p id="stars"></p>
+            <p id="address"></p>
+            <a href="" id="website"></a>
         </aside>
     </main>
   </body>
@@ -83,7 +87,9 @@
 
     var restaurants;
     const requestData = async function() {
-        const data = await d3.csv("yelp_boston.csv", d3.autoType);
+        const data = await d3.csv("yelp_boston2.csv", d3.autoType);
+        const similarities = await d3.csv("similarities.csv")
+        
         console.log(data);
 
         restaurants = svg.selectAll("circle.point")
@@ -96,6 +102,18 @@
 
         restaurants.on("click", function(e, d) {
             console.log(d);
+
+            //clear all selections
+            d3.selectAll("circle.point")
+                .transition().duration(100)
+                .attr("stroke","")
+                .attr("stroke-width", 1);
+            //make this one selected!
+            d3.select(this)
+                .transition().duration(100)
+                .attr("stroke","black")
+                .attr("stroke-width", 4);
+
             showDetail(d);
         });
 
@@ -110,8 +128,53 @@
     }
 
     function showDetail(d) {
+        
+
         d3.select('#restaurant-name')
         .text(d.name);
+
+        d3.select('#category').text(`${d['search category']}`).style('font-style', 'italic')
+
+        // FOR NOW THIS DOESN'T HANDLE 0.5 STARS. SO IT ALWAYS ROUNDS UP.
+        starstring = "";
+        for(i=0; i<d.rating; i++){
+            starstring = starstring + "\u2B50"
+            d3.select('#stars').text(`${starstring} (${d.review_count})`);
+        }
+
+        d3.select('#address').text(`Address: ${d.address}`)
+
+        let detailContainer = document.getElementById("detail-sidebar");
+        d3.selectAll("#website").text("Website").on("click", function() { window.open(`${d.url}`);})
+            .style('border', 1)
+        
+        //bullshit spaghetti
+        // required me to put the datasets as input into this function which didn't make sense... 
+        // i assume this means it shouldnt go in this function. 
+
+        // const categories = ['breakfast_brunch', 'burgers', 'sandwiches', 'mexican', 'japanese', 'italian', 'pizza', 'seafood', 'raw_food', 'newamerican', 
+        //     'mediterranean', 'vegan', 'gluten_free', 'spanish', 'wine_bars', 'tapasmallplates', 'salad', 'juicebars', 'vegetarian', 'indpak', 
+        //     'belgian', 'tradamerican', 'pubs', 'korean', 'asianfusion', 'lounges', 'coffee', 'delis', 'grocery', 'bakeries', 'gastropubs', 
+        //     'bars', 'cocktailbars', 'desserts', 'french', 'steak', 'cheese', 'bubbletea', 'vietnamese', 'catering', 
+        //     'cheesesteaks', 'turkish', 'falafel', 'pakistani', 'bangladeshi', 'himalayan', 'halal', 'hotdogs', 'sushi', 'hotpot', 'mongolian', 
+        //     'dimsum', 'cantonese', 'foodtrucks', 'latin', 'thai', 'icecream', 'donuts', 'cupcakes', 'greek', 'ethnicmarkets', 
+        //     'armenian', 'mideastern', 'chinese']
+        // //get the list of similar restaurants 
+        // let sim_restaurants=""
+        // for(i=0; i<categories.length; i++){
+        //     if(d[`${categories[i]}`] == 1){
+        //         sim_restaurants = sim_restaurants + s[0][`${categories[i]}`];
+        //     }
+        // }
+        // let sim_restaurants_list = sim_restaurants.split("; ")
+        // console.log(data)
+
+        //AFTER I HAVE THE LIST I CANNOT FIGURE OUT HOW TO SELECT ONLY THE CIRCLES THAT ARE IN THIS LIST???
+        
+        
+        
+             
+
     }
 
   </script>
