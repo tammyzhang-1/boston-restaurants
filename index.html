@@ -42,12 +42,62 @@
         #detail-sidebar {
             width: 30%;
             height: 100vh;
-            background-color: rgb(244, 244, 244);
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         #details {
             padding: 1em;
             box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+        }
+
+        #review-info, .rec-rating-info {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+        }
+
+        #selected-details {
+            height: 50%;
+        }
+
+        #rec-container {
+            height: 42%;
+            overflow-y: scroll;
+            width: 100%;
+            background-color:rgb(252, 252, 252);
+            border-top: solid 1px rgb(240, 240, 240);
+            padding-top: 1em;
+        }
+
+        h2 {
+            margin: 0;
+            padding-left: 1em;
+            font-size: 1.25em;
+        }
+
+        h3 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .recommendation-card {
+            background-color: rgb(248, 248, 248);
+            border-radius: 5px;
+            padding: 1em;
+            margin: 0.5em;
+        }
+
+        .recommendation-card:hover {
+            background-color: white;
+            box-shadow: inset 0 0 0 1px rgb(248, 248, 248);
         }
 
     </style>
@@ -57,13 +107,21 @@
     <main>
         <div id="map"></div>
         <aside id="detail-sidebar">
-            <img id="main-image" class="hidden" src="" alt="restaurant image" style="width:100%; height: 200px; object-fit: cover;">
-            <div id="details">
-                <h1 id="restaurant-name"></h1>
-                <p id="category"></p>
-                <div id="stars"></div>
-                <p id="address"></p>
-                <a href="" id="website"></a>
+            <div id="selected-details">
+                <img id="main-image" class="hidden" src="" alt="restaurant image" style="width:100%; height: 200px; object-fit: cover;">
+                <div id="details">
+                    <h1 id="restaurant-name"></h1>
+                    <p id="category"></p>
+                    <div id="review-info">
+                        <div id="stars"></div>
+                        <span id="review-count"></span>
+                    </div>
+                    <p id="address"></p>
+                    <a href="" id="website"></a>
+                </div>
+            </div>
+            <div id="rec-container">
+                <h2 id="rec-header" class="hidden">Similar Restaurants for You</h2>
             </div>
         </aside>
     </main>
@@ -149,9 +207,7 @@
                 .attr("stroke","black")
                 .attr("stroke-width", 4)
                 .style('fill', '#ff0000')
-                .attr('opacity', 1);
-            
-            
+                .attr('opacity', 1);  
         });
 
         map.on("viewreset", render);
@@ -180,17 +236,20 @@
         let starContainer = document.getElementById("stars");
         starContainer.innerHTML = ""; //clear all the existing stars
         for(i=0; i<Math.floor(d.rating); i++){
-            starContainer.innerHTML += `<img src="star-icon.png" alt="star" width="24" height="25">`
+            starContainer.innerHTML += `<img src="star-icon.png" alt="star" width="22" height="23">`
         }
         if(d.rating - Math.floor(d.rating)>0){
-            starContainer.innerHTML += `<img src="star-icon-half.png" alt="star" width="13" height="25">`
+            starContainer.innerHTML += `<img src="star-icon-half.png" alt="star" width="11" height="23">`
         }
+
+        d3.select("#review-count").text(`(${d.review_count} reviews)`);
 
         d3.select('#address').text(`Address: ${d.address}`)
 
         d3.selectAll("#website").text("Website").on("click", function() { window.open(`${d.url}`);})
             .style('border', 1)
 
+        d3.select('#rec-header').classed('hidden', false);
         //list of similar restaurants 
         sim_restaurants = []  
         data.forEach(r=>{
@@ -199,6 +258,36 @@
             }
         })
         console.log(sim_restaurants)
+
+        d3.selectAll(".recommendation-card").remove();
+        document.getElementById('rec-container').scrollTop = 0;
+
+        d3.selectAll(".recommendation-card").
+       
+        sim_restaurants.forEach((rec, i) => {
+            d3.select("#rec-container").append("div")
+                .attr("class", "recommendation-card")
+                .html(`<h3>${rec.name}</h3>
+                <div class="rec-rating-info">
+                    <div id="${"rec-rating"+(i+1)}"></div>
+                    <span id="${"rec-review-count"+(i+1)}">(${rec.review_count} reviews)</span>
+                </div>`);
+
+            let recStarContainer = d3.select("#rec-rating"+(i+1));
+
+            for(j=0; j<Math.floor(rec.rating); j++){
+                recStarContainer.html(recStarContainer.html() + `<img src="star-icon.png" alt="star" width="22" height="23" />`)  
+            }
+            if(rec.rating - Math.floor(rec.rating)>0){
+                recStarContainer.html(recStarContainer.html() + `<img src="star-icon-half.png" alt="star" width="11" height="23" />`)  
+            }
+        })
+
+        let recommendations = d3.selectAll("div.recommendation-card");
+        console.log(recommendations);
+        recommendations.on("mouseenter", function() {
+            console.log(this);
+        })
     }
     
 
