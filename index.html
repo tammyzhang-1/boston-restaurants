@@ -22,6 +22,10 @@
             display: flex;
         }
 
+        .hidden {
+            display: none;
+        }
+
         /* --- map --- */
         #map {
             position: relative;
@@ -39,9 +43,13 @@
             width: 30%;
             height: 100vh;
             background-color: rgb(244, 244, 244);
+        }
+
+        #details {
             padding: 1em;
             box-sizing: border-box;
         }
+
     </style>
   </head>
 
@@ -49,11 +57,14 @@
     <main>
         <div id="map"></div>
         <aside id="detail-sidebar">
-            <h1 id="restaurant-name"></h1>
-            <p id="category"></p>
-            <div id="stars"></div>
-            <p id="address"></p>
-            <a href="" id="website"></a>
+            <img id="main-image" class="hidden" src="" alt="restaurant image" style="width:100%; height: 200px; object-fit: cover;">
+            <div id="details">
+                <h1 id="restaurant-name"></h1>
+                <p id="category"></p>
+                <div id="stars"></div>
+                <p id="address"></p>
+                <a href="" id="website"></a>
+            </div>
         </aside>
     </main>
   </body>
@@ -88,7 +99,8 @@
     var restaurants;
     const requestData = async function() {
         const data = await d3.csv("yelp_boston2.csv", d3.autoType);
-        const similarities = await d3.csv("similarities.csv")
+        const similarities = await d3.csv("similarities.csv");
+        const images = await d3.json("images.json");
         
         console.log(data);
 
@@ -128,7 +140,7 @@
                 .attr("stroke-width", 1);
             
 
-            showDetail(d, data);
+            showDetail(d, images, data);
             updateDots(d['search category']);
 
             //make this one selected!
@@ -152,8 +164,13 @@
                 .attr("cy", function(d) { return project(d.longitude, d.latitude).y });
     }
 
-    function showDetail(d, data) {
-        
+    function showDetail(d, images, data) {
+        d3.select('#main-image').classed('hidden', false);
+        let businessID = d.url.split("http://www.yelp.com/biz/")[1];
+        let mainImage = images.filter(business => business.id == businessID);
+
+        d3.select('#main-image')
+            .attr('src', mainImage[0].imageURL);
 
         d3.select('#restaurant-name')
         .text(d.name);
