@@ -92,31 +92,69 @@
         
         console.log(data);
 
-        restaurants = svg.selectAll("circle.point")
-            .data(data)
-            .join("circle").attr("class", "point")
-            .attr("r", 5)
-            .style("fill", "#ff0000");
+        // restaurants = svg.selectAll("circle.point")
+        //     .data(data)
+        //     .join("circle").attr("class", "point")
+        //     .attr("r", 5)
+        //     .style("fill", "#ff0000");
+
         
+        
+
+        function updateDots(selected_category){
+            restaurants = svg.selectAll("circle.point").data(data, d=>d.name)
+                        .join(enter => enter.append("circle")
+                                            .attr("class","point")
+                                            .attr("r", 6)
+                                            .style("fill", "#808080")
+                                            .attr('opacity', 0.8),
+                            update => update.call(update => update.transition()
+                                            .duration(50)
+                                            .style("fill", (d=>d['search category']== selected_category ? '#ff0000' : '#808080'))
+                                            .attr("opacity", (d=>d['search category']== selected_category ? '1' : '0.5'))
+                                            ),
+                            //exit => exit.call( exit => exit.transition().style('fill', '#808080').attr('opacity',0.5).remove())           
+                                            )  
+        }
+
+        updateDots(""); 
+
         render();
 
         restaurants.on("click", function(e, d) {
-            console.log(d);
-
+        
             //clear all selections
             d3.selectAll("circle.point")
                 .transition().duration(100)
+                .style('fill', '#808080')
                 .attr("stroke","")
                 .attr("stroke-width", 1);
             //make this one selected!
             d3.select(this)
                 .transition().duration(100)
                 .attr("stroke","black")
-                .attr("stroke-width", 4);
+                .attr("stroke-width", 4)
+                // .style('fill', 'black');
 
             showDetail(d);
-            updateDots(d, data, similarities)
+            updateDots(d['search category']);
+            
+            
         });
+
+        // circles.on("mouseover", function(event, d) { 
+        //     d3.select(this)
+        //         .transition().duration(100)
+        //         .attr("stroke","black")
+        //         .attr("stroke-width", 4);
+        // });
+
+        // circles.on("mouseout", function(event, d) {
+        //     d3.select(this)
+        //         .transition().duration(100)
+        //         .attr("stroke-width", 1); 
+            
+        // });
 
         map.on("viewreset", render);
         map.on("move", render);
@@ -148,31 +186,6 @@
         let detailContainer = document.getElementById("detail-sidebar");
         d3.selectAll("#website").text("Website").on("click", function() { window.open(`${d.url}`);})
             .style('border', 1)
-    }
-
-    function updateDots(d, data, s){
-        //bullshit spaghetti
-        // required me to put the datasets as input into this function which didn't make sense... 
-        // i assume this means it shouldnt go in this function. 
-
-        const categories = ['breakfast_brunch', 'burgers', 'sandwiches', 'mexican', 'japanese', 'italian', 'pizza', 'seafood', 'raw_food', 'newamerican', 
-            'mediterranean', 'vegan', 'gluten_free', 'spanish', 'wine_bars', 'tapasmallplates', 'salad', 'juicebars', 'vegetarian', 'indpak', 
-            'belgian', 'tradamerican', 'pubs', 'korean', 'asianfusion', 'lounges', 'coffee', 'delis', 'grocery', 'bakeries', 'gastropubs', 
-            'bars', 'cocktailbars', 'desserts', 'french', 'steak', 'cheese', 'bubbletea', 'vietnamese', 'catering', 
-            'cheesesteaks', 'turkish', 'falafel', 'pakistani', 'bangladeshi', 'himalayan', 'halal', 'hotdogs', 'sushi', 'hotpot', 'mongolian', 
-            'dimsum', 'cantonese', 'foodtrucks', 'latin', 'thai', 'icecream', 'donuts', 'cupcakes', 'greek', 'ethnicmarkets', 
-            'armenian', 'mideastern', 'chinese']
-        //get the list of similar restaurants 
-        let sim_restaurants=""
-        for(i=0; i<categories.length; i++){
-            if(d[`${categories[i]}`] == 1){
-                sim_restaurants = sim_restaurants + s[0][`${categories[i]}`];
-            }
-        }
-        let sim_restaurants_list = sim_restaurants.split("; ")
-        console.log(sim_restaurants_list)
-
-        //AFTER I HAVE THE LIST I CANNOT FIGURE OUT HOW TO SELECT ONLY THE CIRCLES THAT ARE IN THIS LIST??    
     }
     
 
