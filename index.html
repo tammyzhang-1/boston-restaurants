@@ -51,7 +51,7 @@
         <aside id="detail-sidebar">
             <h1 id="restaurant-name"></h1>
             <p id="category"></p>
-            <p id="stars"></p>
+            <div id="stars"></div>
             <p id="address"></p>
             <a href="" id="website"></a>
         </aside>
@@ -129,15 +129,18 @@
                 .style('fill', '#808080')
                 .attr("stroke","")
                 .attr("stroke-width", 1);
+            
+
+            showDetail(d);
+            updateDots(d['search category']);
+
             //make this one selected!
             d3.select(this)
                 .transition().duration(100)
                 .attr("stroke","black")
                 .attr("stroke-width", 4)
-                // .style('fill', 'black');
-
-            showDetail(d);
-            updateDots(d['search category']);
+                .style('fill', '#ff0000')
+                .attr('opacity', 1);
             
             
         });
@@ -174,16 +177,19 @@
 
         d3.select('#category').text(`${d['search category']}`).style('font-style', 'italic')
 
-        // FOR NOW THIS DOESN'T HANDLE 0.5 STARS. SO IT ALWAYS ROUNDS UP.
-        starstring = "";
-        for(i=0; i<d.rating; i++){
-            starstring = starstring + "\u2B50"
-            d3.select('#stars').text(`${starstring} (${d.review_count})`);
+
+
+        let starContainer = document.getElementById("stars");
+        starContainer.innerHTML = ""; //clear all the existing stars
+        for(i=0; i<Math.floor(d.rating); i++){
+            starContainer.innerHTML += `<img src="star-icon.png" alt="star" width="24" height="25">`
+        }
+        if(d.rating - Math.floor(d.rating)>0){
+            starContainer.innerHTML += `<img src="star-icon-half.png" alt="star" width="13" height="25">`
         }
 
         d3.select('#address').text(`Address: ${d.address}`)
 
-        let detailContainer = document.getElementById("detail-sidebar");
         d3.selectAll("#website").text("Website").on("click", function() { window.open(`${d.url}`);})
             .style('border', 1)
     }
