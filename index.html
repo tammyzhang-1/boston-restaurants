@@ -308,6 +308,8 @@
         
             d3.selectAll("circle.point").classed("selected-point", false);
             d3.select("#detail-sidebar").style("justify-content", "normal");    
+
+            d3.selectAll(".category-filter").classed("active-filter", false);
             updateDots(""); 
         });
 
