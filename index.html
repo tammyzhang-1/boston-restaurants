@@ -201,7 +201,7 @@
                     <a href="" id="website"></a>
                 </div>
             </div>
-            <div id="rec-container">
+            <div id="rec-container" class="hidden">
                 <h2 id="rec-header" class="hidden">Similar Restaurants for You</h2>
             </div>
         </aside>
@@ -284,11 +284,10 @@
                 if (d['search category']== selected_category && !d3.select(this).classed("selected-point")) { 
                     d3.select(this).style("fill", "blue"); 
                     
-                    setTimeout(function() {
-                        let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
-                        hoveredDiv.classed("recommendation-card-highlight", true);
-                        scrollToRec(d.name);
-                    }, 100);
+                    let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
+                    hoveredDiv.classed("recommendation-card-highlight", true);
+                    scrollToRec(d.name);
+             
                 }
             });
             restaurants.on("mouseout", function(e, d) {
@@ -327,7 +326,6 @@
                 .attr("stroke","")
                 .attr("stroke-width", 1);
             
-
             showDetail(d, images, data);
             updateDots(d['search category']);
 
@@ -352,6 +350,7 @@
         d3.select('#rec-container').classed('hidden', false);
 
         d3.select("#close-button").classed("hidden", false);
+        d3.select("#detail-sidebar").style("justify-content", "space-between");   
    
         d3.select('#category-filters').classed('hidden', true);
         d3.select('#introduction').classed('hidden', true);
