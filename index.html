@@ -392,6 +392,13 @@
             }
         })
 
+        let currentRestaurant = d.name;
+        //remove the selected restaurant from the list
+        sim_restaurants = sim_restaurants.filter(function( d ) {
+            return d.name !== currentRestaurant;
+        });
+
+        //sort by rating
         function compare( a, b ) {
             if ( a.rating < b.rating ){
                 return 1;
