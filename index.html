@@ -23,7 +23,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         /* --- map --- */
@@ -53,7 +53,7 @@
             box-sizing: border-box;
         }
 
-        /* ------- category filter sidebar ------- */
+        /* ------- category filters ------- */
         #controls-sidebar {
           width: 20%;
           display: flex;
@@ -229,6 +229,7 @@
             restaurants = svg.selectAll("circle.point").data(data, d=>d.name)
                         .join(enter => enter.append("circle")
                                             .attr("class","point")
+                                            .attr("name", d=>d.name)
                                             .attr("r", 6)
                                             .style("fill", "#808080")
                                             .attr('opacity', 0.8),
@@ -239,6 +240,16 @@
                                             ),
                             //exit => exit.call( exit => exit.transition().style('fill', '#808080').attr('opacity',0.5).remove())           
                                             )  
+            restaurants.on("mouseover", function(e, d) {
+                if (d['search category']== selected_category) { 
+                    d3.select(this).style("fill", "blue"); 
+                }
+            });
+            restaurants.on("mouseout", function(e, d) {
+                if (d['search category']== selected_category) { 
+                    d3.select(this).style("fill", "red"); 
+                }
+            });
         }
 
         updateDots(""); 
@@ -267,6 +278,8 @@
                 .attr('opacity', 1);  
         });
 
+        
+
         map.on("viewreset", render);
         map.on("move", render);
         map.on("moveend", render);
@@ -278,6 +291,7 @@
     }
 
     function showDetail(d, images, data) {
+        d3.select('#category-filters').classed('hidden', true);
         d3.select('#main-image').classed('hidden', false);
         let businessID = d.url.split("http://www.yelp.com/biz/")[1];
         let mainImage = images.filter(business => business.id == businessID);
@@ -319,19 +333,19 @@
         d3.selectAll(".recommendation-card").remove();
         document.getElementById('rec-container').scrollTop = 0;
 
-        d3.selectAll(".recommendation-card").
-       
+        let reviewContainer = d3.select("#rec-container");
+
+        let recommendations = reviewContainer.selectAll("div.recommendation-card").data(sim_restaurants).join("div")
+            .attr("class", "recommendation-card")
+            .attr("name", d=>d.name)
+            .html((d, i) => `<h3>${d.name}</h3>
+            <div class="rec-rating-info">
+                <div id="${"rec-rating-"+ i}"></div>
+                <span id="rec-review-count">(${d.review_count} reviews)</span>
+            </div>`);
+
         sim_restaurants.forEach((rec, i) => {
-            d3.select("#rec-container").append("div")
-                .attr("class", "recommendation-card")
-                .html(`<h3>${rec.name}</h3>
-                <div class="rec-rating-info">
-                    <div id="${"rec-rating"+(i+1)}"></div>
-                    <span id="${"rec-review-count"+(i+1)}">(${rec.review_count} reviews)</span>
-                </div>`);
-
-            let recStarContainer = d3.select("#rec-rating"+(i+1));
-
+            let recStarContainer = d3.select("#rec-rating-"+i);
             for(j=0; j<Math.floor(rec.rating); j++){
                 recStarContainer.html(recStarContainer.html() + `<img src="star-icon.png" alt="star" width="22" height="23" />`)  
             }
@@ -340,12 +354,17 @@
             }
         })
 
-        let recommendations = d3.selectAll("div.recommendation-card");
-        console.log(recommendations);
-        recommendations.on("mouseenter", function() {
-            console.log(this);
-        })
+        recommendations.on("mouseover", function(e, d) {
+            const hoveredDot = d3.select(`circle[name="${d.name}"]`);
+            hoveredDot.style("fill", "blue");
+        });
+
+        recommendations.on("mouseout", function(e, d) {
+            const hoveredDot = d3.select(`circle[name="${d.name}"]`);
+            hoveredDot.style("fill", "red");
+        });   
     }
+
     
 
   </script>
