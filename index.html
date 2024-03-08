@@ -53,12 +53,31 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px;
+        }
+
+        #introduction, #category-filters {
+            padding-right: 1.5em;
+            padding-left: 1.5em;
+            box-sizing: border-box;
+        }
+
+        #introduction {
+            padding-top: 1.5em;
         }
 
         #details {
             padding: 1em;
             box-sizing: border-box;
+        }
+
+        #close-button {
+            position: absolute;
+            top: 7;
+            right: 10;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 2;
+            color: white;
         }
 
         /* ------- category filters ------- */
@@ -169,6 +188,7 @@
             </div>
             <div id="category-filters"></div>
             <div id="selected-details">
+                <span id="close-button" class="hidden">X</span>
                 <img id="main-image" class="hidden" src="" alt="restaurant image" style="width:100%; height: 200px; object-fit: cover;">
                 <div id="details">
                     <h1 id="restaurant-name"></h1>
@@ -279,12 +299,24 @@
             });
         }
 
+        d3.select("#close-button").on("click", function() {
+            d3.select('#category-filters').classed('hidden', false);
+            d3.select('#introduction').classed('hidden', false);
+    
+            d3.select('#selected-details').classed('hidden', true);
+            d3.select('#rec-container').classed('hidden', true);
+        
+            d3.selectAll("circle.point").classed("selected-point", false);
+            d3.select("#detail-sidebar").style("justify-content", "normal");    
+            updateDots(""); 
+        });
+
         updateDots(""); 
 
         render();
 
         restaurants.on("click", function(e, d) {
-        
+            
             //clear all selections
             d3.selectAll("circle.point")
                 .classed("selected-point", false)
@@ -313,6 +345,12 @@
 
     function showDetail(d, images, data) {
         document.getElementById('rec-container').scrollTop = 0;
+    
+        d3.select('#selected-details').classed('hidden', false);
+        d3.select('#rec-container').classed('hidden', false);
+
+        d3.select("#close-button").classed("hidden", false);
+   
         d3.select('#category-filters').classed('hidden', true);
         d3.select('#introduction').classed('hidden', true);
         d3.select('#main-image').classed('hidden', false);
@@ -413,6 +451,8 @@
             return function(t) { container.scrollTop = i(t); };
         });
     }
+
+
     
 
   </script>
