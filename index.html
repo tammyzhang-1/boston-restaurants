@@ -46,6 +46,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            padding: 20px;
         }
 
         #details {
@@ -65,7 +66,7 @@
         }
 
         #category-filters {
-            display: flex;
+            /* display: flex; */
             flex-direction: column;
             width: 100%;
             justify-content: center;
@@ -76,11 +77,12 @@
 
         .category-filter {
           background-color: white;
-          flex-grow: 1;
+          /* flex-grow: 1; */
           border: solid 3px rgb(205, 205, 205);
           border-radius: 20px;
           font-weight: normal;
           font-size: 1em;
+          margin: 2px;
         }
 
         .category-filter:not(.active-filter):hover {
@@ -148,6 +150,10 @@
     <main>
         <div id="map"></div>
         <aside id="detail-sidebar">
+            <div id="introduction">
+                <h1>What are you hungry for?</h1>
+                <p>Choose a cuisine, or click on dots on the map!</p>
+            </div>
             <div id="category-filters"></div>
             <div id="selected-details">
                 <img id="main-image" class="hidden" src="" alt="restaurant image" style="width:100%; height: 200px; object-fit: cover;">
@@ -292,6 +298,7 @@
 
     function showDetail(d, images, data) {
         d3.select('#category-filters').classed('hidden', true);
+        d3.select('#introduction').classed('hidden', true);
         d3.select('#main-image').classed('hidden', false);
         let businessID = d.url.split("http://www.yelp.com/biz/")[1];
         let mainImage = images.filter(business => business.id == businessID);
