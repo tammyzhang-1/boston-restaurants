@@ -38,6 +38,13 @@
             cursor: pointer;
         }
 
+        .selected-point {
+            stroke: black;
+            stroke-width: 4px;
+            fill: '#ff0000';
+            opacity: 1;
+        }
+
         /* --- sidebar --- */
         #detail-sidebar {
             width: 30%;
@@ -139,6 +146,7 @@
         .recommendation-card:hover {
             background-color: white;
             box-shadow: inset 0 0 0 1px rgb(248, 248, 248);
+            cursor: pointer;
         }
 
     </style>
@@ -241,13 +249,21 @@
                             //exit => exit.call( exit => exit.transition().style('fill', '#808080').attr('opacity',0.5).remove())           
                                             )  
             restaurants.on("mouseover", function(e, d) {
-                if (d['search category']== selected_category) { 
+                if (d['search category']== selected_category && !d3.select(this).classed("selected-point")) { 
                     d3.select(this).style("fill", "blue"); 
+
+                    setTimeout(function() {
+                        let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
+                        hoveredDiv.style("background-color", "white").style("box-shadow", "inset 0 0 0 1px gray");
+                        scrollToRec(d.name);
+                    }, 100);
                 }
             });
             restaurants.on("mouseout", function(e, d) {
                 if (d['search category']== selected_category) { 
                     d3.select(this).style("fill", "red"); 
+                    let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
+                    hoveredDiv.style("background-color", "rgb(248, 248, 248)").style("box-shadow", "none");
                 }
             });
         }
@@ -260,6 +276,7 @@
         
             //clear all selections
             d3.selectAll("circle.point")
+                .classed("selected-point", false)
                 .transition().duration(100)
                 .style('fill', '#808080')
                 .attr("stroke","")
@@ -270,15 +287,8 @@
             updateDots(d['search category']);
 
             //make this one selected!
-            d3.select(this)
-                .transition().duration(100)
-                .attr("stroke","black")
-                .attr("stroke-width", 4)
-                .style('fill', '#ff0000')
-                .attr('opacity', 1);  
+            d3.select(this).classed("selected-point", true)
         });
-
-        
 
         map.on("viewreset", render);
         map.on("move", render);
@@ -291,6 +301,7 @@
     }
 
     function showDetail(d, images, data) {
+        document.getElementById('rec-container').scrollTop = 0;
         d3.select('#category-filters').classed('hidden', true);
         d3.select('#main-image').classed('hidden', false);
         let businessID = d.url.split("http://www.yelp.com/biz/")[1];
@@ -331,7 +342,6 @@
         console.log(sim_restaurants)
 
         d3.selectAll(".recommendation-card").remove();
-        document.getElementById('rec-container').scrollTop = 0;
 
         let reviewContainer = d3.select("#rec-container");
 
@@ -355,16 +365,42 @@
         })
 
         recommendations.on("mouseover", function(e, d) {
-            const hoveredDot = d3.select(`circle[name="${d.name}"]`);
-            hoveredDot.style("fill", "blue");
+            d3.select(`circle[name="${d.name}"]`).style("fill", "blue");
         });
 
         recommendations.on("mouseout", function(e, d) {
-            const hoveredDot = d3.select(`circle[name="${d.name}"]`);
-            hoveredDot.style("fill", "red");
+            d3.select(`circle[name="${d.name}"]`).style("fill", "red");
         });   
+
+        recommendations.on("click", function(e, d) {
+            showDetail(d, images, data);
+
+            d3.selectAll("circle.point").classed("selected-point", false)
+            
+            console.log(d)
+    
+            d3.select(`circle[name="${d.name}"]`)
+                .classed("selected-point", true)
+        });
     }
 
+    // referencing this post: https://stackoverflow.com/questions/14246768/d3js-how-to-scroll-or-tween-properties/
+    function scrollToRec(divName) {
+        const scrollArea = d3.select("#rec-container");
+        const container = d3.select("#rec-container").node();
+        const targetDiv = d3.select(`div[name="${divName}"]`).node();
+
+        const offsetTop = targetDiv.offsetTop;
+        const containerScrollTop = container.scrollTop;
+        const containerTop = container.getBoundingClientRect().top;
+
+        scrollArea.transition()
+        .duration(500) 
+        .tween("scroll", function() {
+            const i = d3.interpolateNumber(containerScrollTop, offsetTop - containerTop - 2);
+            return function(t) { container.scrollTop = i(t); };
+        });
+    }
     
 
   </script>
