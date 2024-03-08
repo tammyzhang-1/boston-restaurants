@@ -446,11 +446,10 @@
             showDetail(d, images, data);
 
             d3.selectAll("circle.point").classed("selected-point", false)
-            
-            console.log(d)
     
             d3.select(`circle[name="${d.name}"]`)
                 .classed("selected-point", true)
+                .style("fill", "red");
         });
     }
 
