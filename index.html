@@ -151,6 +151,11 @@
             cursor: pointer;
         }
 
+        .recommendation-card-highlight {
+            background-color: white;
+            box-shadow: inset 0 0 0 1px gray;
+        }
+
     </style>
   </head>
 
@@ -255,21 +260,21 @@
                             //exit => exit.call( exit => exit.transition().style('fill', '#808080').attr('opacity',0.5).remove())           
                                             )  
             restaurants.on("mouseover", function(e, d) {
+                d3.selectAll("div.recommendation-card").classed("recommendation-card-highlight", false);
                 if (d['search category']== selected_category && !d3.select(this).classed("selected-point")) { 
                     d3.select(this).style("fill", "blue"); 
-
+                    
                     setTimeout(function() {
                         let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
-                        hoveredDiv.style("background-color", "white").style("box-shadow", "inset 0 0 0 1px gray");
+                        hoveredDiv.classed("recommendation-card-highlight", true);
                         scrollToRec(d.name);
                     }, 100);
                 }
             });
             restaurants.on("mouseout", function(e, d) {
                 if (d['search category']== selected_category) { 
+                    d3.selectAll("div.recommendation-card").classed("recommendation-card-highlight", false);
                     d3.select(this).style("fill", "red"); 
-                    let hoveredDiv = d3.select(`div.recommendation-card[name="${d.name}"]`);
-                    hoveredDiv.style("background-color", "rgb(248, 248, 248)").style("box-shadow", "none");
                 }
             });
         }
